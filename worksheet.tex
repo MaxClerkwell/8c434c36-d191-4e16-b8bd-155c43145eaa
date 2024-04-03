@@ -7,43 +7,54 @@
 
 
 \begin{document}
+We have observed that compiling code on our local machines can be quite challenging, primarily because our resources are limited and may not meet our requirements. Therefore, it is interesting to explore methods of programming on machines other than our local ones. We want to access a large computer in a server center that can compile our projects very easily without needing to travel to these centers (they won't let us in anyways).
 
+You may be familiar with the SSH protocol. 
+In the late 1990s, Tatu Ylönen developed the SSH (Secure Shell) protocol as an advanced protocol for secure remote connections and as a successor to Telnet. Before SSH, Telnet had significant security vulnerabilities that were exploited. 
+SSH enables encrypted connections over insecure networks to provide secure logins, file transfers and command execution on remote computers.
+For secure remote connections to Unix-like systems, SSH quickly became the protocol of choice. Its importance extends beyond simple secure logins, enabling secure file transfer via SCP and SFTP, and facilitating secure remote command execution. SSH's encryption and authentication features ensure the confidentiality and integrity of sensitive data, making it indispensable to system administrators and cybersecurity efforts worldwide.
 
-We have observed that compiling code on our local machines can be quite challenging, primarily because our resources are limited and may not meet our requirements. It is essential to explore methods of programming on machines other than our local ones.
-
-You might be familiar with the SSH protocol. In the late nineties, Tatu Ylönen developed this advanced remote connection protocol, which became the successor to Telnet. Before SSH, major vulnerabilities in Telnet were exploited. SSH stands for Secure Shell and quickly became the preferred protocol for secure remote connections to Unix-like systems.
 
 \section*{Exercise}
 \begin{aufgabe}
-    \item To utilize the SSH service, we must ensure that \texttt{openssh-server} is installed on both the host and the client systems. In your command line, try executing the command \texttt{sudo apt update} followed by \texttt{sudo apt install openssh-server}. Nowadays, the SSH server comes by default in most Linux distributions. However, it is always better to check if our host system meets all the requirements.
+\begin{itemize}
+    \item To utilize the SSH service, we need to ensure that \texttt{openssh-server} is installed on the host system. In your command line, try executing the command \texttt{sudo apt update} followed by \texttt{apt install openssh-server}. Nowadays, the SSH server comes by default in most Linux distributions. However, it is always better to check if our host system meets all the requirements.
 
-    \item Now, execute \texttt{sudo systemctl start ssh} followed by \texttt{sudo systemctl enable ssh}. Each time you boot the host system, the SSH server will also start, ensuring it is always ready.
+    \item Now, execute \texttt{systemctl start ssh} followed by \texttt{systemctl enable ssh}. Each time you boot the host system, the SSH server will also start, ensuring it is always ready. Systemctl is the command line tool for working with systemd-services. systemd is responsbile for managing all relevant services running on your machine, including starting them as well as shutting them down.
 
-    \item After confirming that OpenSSH is installed, we can proceed to log onto a client system. Type \texttt{ssh student@someipv4}. A dialogue should open, asking for an authentication password: \texttt{hck2994kls#9}.
+    \item After confirming that OpenSSH is installed, we can proceed to log into another system. Do this by running \texttt{ssh student@49.12.40.53}. A dialogue should open, asking for an authentication password: \texttt{hck2994kls\#9}. What did you just do by running the ssh-command? Which machine are you connected to, and who are you?
     
-    \item Before diving into the details, let's take a step back and recap what exactly happened. As we entered the SSH command to connect to the client server, we defined several things without realizing it. To establish a successful remote connection between two systems, the SSH protocol uses one outgoing port on the host system and one incoming port on the client system, by default, Port 22. If we do not explicitly provide the flag \texttt{-p <port>}, for example, \texttt{-p 1793} in the SSH command, the default port will be used. Since using defaults can sometimes pose a security risk, you should always configure a custom port by editing the system file \texttt{/etc/ssh/sshd\_config}. Ensure the user has the necessary permissions. After changing the system's SSH port, you need to specify the port every time you attempt to log onto the client system.
+    \item Before diving into the details, let's take a step back and recap what exactly happened. As we entered the SSH command to connect to the client server, we defined several things without realizing it. To establish a successful remote connection between two systems, the SSH protocol uses one outgoing port on the host system and one incoming port on the client system, by default, Port 22. If we do not explicitly provide the flag \texttt{-p <port>}, for example, \texttt{-p 1793} in the SSH command, the default port will be used. We also specified whom we want to be on a specific machine (<user>@<machine>).
 
-    \item However, this is still not considered "best practice." In a production environment, the only correct way to log onto a client system using SSH is by connecting via an SSH key. An SSH key is always an asymmetric key pair. The private key remains on the host system, and the public key is transferred to the client system. Do the following steps:
+    Note for all security nerds:
+    Since using defaults can sometimes pose a security risk, you should always configure a custom port by editing the system file \texttt{/etc/ssh/sshd\_config}. Ensure the user has the necessary permissions. After changing the system's SSH port, you need to specify the port every time you attempt to log onto the client system.
+
+    \item However, this is still not considered "best practice." In a production environment, the only correct way to log onto a client system using SSH is by connecting via an SSH key. After all, handling passwords is a hard topic. An SSH key is always an asymmetric key pair. The private key remains on the host system, and the public key is transferred to the client system. Once you have shown or transferred your private key, DO NOT USE IT ANYMORE! Create a new one, it is not that expensive.
+    
+    Create a keypair by following these steps:
     \begin{enumerate}
         \item To generate an SSH key on our local machine, prompt the command \texttt{ssh-keygen -t rsa -b 4096}. The \texttt{-t rsa} option tells the program \texttt{ssh-keygen} to use the RSA cipher to create a key pair. The \texttt{-b 4096} option sets the bit length of your key. While longer bit rates are more secure, data transfer will also be slower. 4096 Bits is secure enough for now.
-        \item After pressing enter, the terminal will ask for a file name for the key. Type in a name of your liking.
-        \item In the directory \texttt{/home/user/.ssh}, there's a file called \texttt{config}. In this file, you can specify how you would like to log into a client system. Let's define one:
+        \item After pressing enter, the terminal will ask for a file name for the key. Type in a name of your liking - ideally one describing the machine you want to use that key with.
+        \item In the directory \texttt{/home/user/.ssh}, there's a file called \texttt{config}. (If not, create it) In this file, you can specify your machine's ssh settings for certain connections. Let's define one:
         \begin{lstlisting}
-            Host <client_name>
-                HostName <ipv4_of_the_client_system>
+            Host <a\_nice\_hostname>
+                HostName <ipv4\_of\_the\_client\_system>
                 IdentityFile <path-to-your-private-key>
-                #Port <custom_port>
-                #User <user_you_log_into>
+                #Port <custom\_port>
+                #User <user\_you\_log\_in_\as>
         \end{lstlisting}
-        \item Save your configuration, and now you can connect via SSH by typing \texttt{ssh <client_name>}.
-        \item To upload the public key to the client system, you can use the command \texttt{ssh-copy-id username@remote_system}. It will automatically save the public key in the \texttt{~/.ssh/authorized\_keys} file. You could also do this manually if preferred. Now, everything is set to use SSH with SSH keys.
+        \item Save your configuration, and now you can connect via SSH by typing \texttt{ssh <a\_nice\_hostname>}.
+        \item To upload the public key to the client system, you can use the command \texttt{ssh-copy-id username@remote_system}. It will automatically save the public key in the \texttt{~/.ssh/authorized\_keys} file. You could also do this manually if preferred.
     \end{enumerate}
 
-    \item After successfully connecting to our client system, let's find out which system we have logged into. The first thing appearing is an empty command line stating: \texttt{student@c-Kurs:\~\$}. So we are currently in the users home directory.
-        Now we want to find out the ip that our client system owns by typing \texttt{ip a}. Find the correct ipv4 address. If the client system is part of multiple networks we could check these as well. 
-        By typing in \texttt{lsb_release -a} the output is going to tell us what linux distribution the system is running on. In this case it should be Debian 12.
-        Knowing what distribution you are using is crutial if you want to use it to its full potential. Most important you can now research how to do specific tasks on the specific OS.
-    \item A simple task to perfom is a speedtest. From your host perform: \texttt{ssh user@remote 'dd if=/dev/zero' | dd of=/dev/null}
+    \item After successfully connecting to our client system, let's find out which system we have logged into. The first thing appearing is an empty command line stating: \texttt{student@c-Kurs:\~\$}. So we are currently in the user's home directory.
+    
+        Now we want to find out the IP that our client system owns by typing \texttt{ip a}. Find the correct ipv4 address. If the client system is part of multiple networks we could check these as well. 
+        Next, let's have a look at the system specifics: The output of \texttt{lsb_release -a} tells us what Linux distribution the system is running on. In this case, it should be Debian 12.
+        Knowing what distribution you are using is crucial, for example to research how to do specific tasks on the specific OS.
+    \item A simple task to perfom is a speedtest. From your host perform: \texttt{ssh user@remote 'dd if=/dev/zero' | dd of=/dev/null} This runs the specified command on the remote machine with the rights assigned to your user. This simple test only looks at the speed of sending an receiving bytes without writing them.
+    
+\end{itemize}
 \end{aufgabe}
 
 \section*{Exercise for Advanced Users}
