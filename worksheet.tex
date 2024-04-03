@@ -15,11 +15,11 @@ You might be familiar with the SSH protocol. In the late nineties, Tatu Ylönen 
 
 \section*{Exercise}
 \begin{aufgabe}
-    \item To utilize the SSH service, we must ensure that \texttt{openssh-server} is installed on both the host and the client systems. In your command line, try executing the command \texttt{sudo apt update} followed by \texttt{sudo apt install openssh-server}. Nowadays, the SSH server comes by default in most Linux distributions. However, it is always better to check if our host system meets all the requirements.
+    \item To utilize the SSH service, we must ensure that \texttt{openssh-server} is installed on both the host systems. In your command line, try executing the command \texttt{sudo apt update} followed by \texttt{sudo apt install openssh-server}. Nowadays, the SSH server comes by default in most Linux distributions. However, it is always better to check if our host system meets all the requirements.
 
     \item Now, execute \texttt{sudo systemctl start ssh} followed by \texttt{sudo systemctl enable ssh}. Each time you boot the host system, the SSH server will also start, ensuring it is always ready.
 
-    \item After confirming that OpenSSH is installed, we can proceed to log onto a client system. Type \texttt{ssh student@someipv4}. A dialogue should open, asking for an authentication password: \texttt{hck2994kls#9}.
+    \item After confirming that OpenSSH is installed, we can proceed to log onto a client system. Type \texttt{ssh student@49.12.40.53}. A dialogue should open, asking for an authentication password: \texttt{hck2994kls#9}.
     
     \item Before diving into the details, let's take a step back and recap what exactly happened. As we entered the SSH command to connect to the client server, we defined several things without realizing it. To establish a successful remote connection between two systems, the SSH protocol uses one outgoing port on the host system and one incoming port on the client system, by default, Port 22. If we do not explicitly provide the flag \texttt{-p <port>}, for example, \texttt{-p 1793} in the SSH command, the default port will be used. Since using defaults can sometimes pose a security risk, you should always configure a custom port by editing the system file \texttt{/etc/ssh/sshd\_config}. Ensure the user has the necessary permissions. After changing the system's SSH port, you need to specify the port every time you attempt to log onto the client system.
 
