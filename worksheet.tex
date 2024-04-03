@@ -23,7 +23,7 @@ For secure remote connections to Unix-like systems, SSH quickly became the proto
 
     \item Now, execute \texttt{systemctl start ssh} followed by \texttt{systemctl enable ssh}. Each time you boot the host system, the SSH server will also start, ensuring it is always ready. Systemctl is the command line tool for working with systemd-services. systemd is responsbile for managing all relevant services running on your machine, including starting them as well as shutting them down.
 
-    \item After confirming that OpenSSH is installed, we can proceed to log into another system. Do this by running \texttt{ssh student\@49.12.40.53}. 
+    \item After confirming that OpenSSH is installed, we can proceed to log into another system. Do this by running \texttt{ssh student@49.12.40.53}. 
     A dialogue should open, asking for an authentication password: \texttt{hck2994kls\#9}. What did you just do by running the ssh-command? Which machine are you connected to, and who are you?
     
     \item Before diving into the details, let's take a step back and recap what exactly happened. As we entered the SSH command to connect to the client server, we defined several things without realizing it. To establish a successful remote connection between two systems, the SSH protocol uses one outgoing port on the host system and one incoming port on the client system, by default, Port 22. If we do not explicitly provide the flag \texttt{-p <port>}, for example, \texttt{-p 1793} in the SSH command, the default port will be used. We also specified whom we want to be on a specific machine (<user>\@<machine>).
@@ -46,7 +46,7 @@ For secure remote connections to Unix-like systems, SSH quickly became the proto
                 #User <user\_you\_log\_in_\as>
         \end{lstlisting}
         \item Save your configuration, and now you can connect via SSH by typing \texttt{ssh <a\_nice\_hostname>}.
-        \item To upload the public key to the client system, you can use the command \texttt{ssh-copy-id username\@remote\_system}. 
+        \item To upload the public key to the client system, you can use the command \texttt{ssh-copy-id -i <pathToKey> username@remote\_system}. 
         It will automatically save the public key in the \texttt{~/.ssh/authorized\_keys} file. 
         You could also do this manually if preferred.
     \end{enumerate}
@@ -56,7 +56,7 @@ For secure remote connections to Unix-like systems, SSH quickly became the proto
         Now we want to find out the IP that our client system owns by typing \texttt{ip a}. Find the correct ipv4 address. If the client system is part of multiple networks we could check these as well. 
         Next, let's have a look at the system specifics: The output of \texttt{lsb\_release -a} tells us what Linux distribution the system is running on. In this case, it should be Debian 12.
         Knowing what distribution you are using is crucial, for example to research how to do specific tasks on the specific OS.
-    \item A simple task to perfom is a speedtest. From your host perform: \texttt{ssh user\@remote 'dd if=/dev/zero' | dd of=/dev/null} This runs the specified command on the remote machine with the rights assigned to your user. This simple test only looks at the speed of sending an receiving bytes without writing them.
+    \item A simple task to perfom is a speedtest. From your host perform: \texttt{ssh user@remote 'dd if=/dev/zero' | dd of=/dev/null} This runs the specified command on the remote machine with the rights assigned to your user. This simple test only looks at the speed of sending an receiving bytes without writing them.
     
 \end{itemize}
 \end{aufgabe}
